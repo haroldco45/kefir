@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kéfir artesanal — Recuerdos de mi Abuela</title>
+  <meta name="description" content="Kéfir y kombucha artesanal, hechos en casa con amor. Refuerza tu salud con probióticos naturales.">
+  <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Lato', sans-serif; background:#f5f0e8; margin:0; padding:0; }
+    header { background:#3d5a1e; color:white; text-align:center; padding:20px; }
+    header h1 { font-family:'Dancing Script', cursive; font-size:2.5rem; }
+    section { padding:20px; text-align:center; }
+    .producto { display:flex; justify-content:space-between; align-items:center; background:#fff; padding:10px; margin:10px auto; max-width:700px; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.2); }
+    .producto input[type="number"], .producto input[type="text"] { width:80px; padding:5px; text-align:center; }
+    .producto input[type="file"] { margin-left:10px; }
+    #total { font-size:1.5rem; font-weight:bold; color:#3d5a1e; margin-top:20px; }
+    table { margin:20px auto; border-collapse:collapse; width:80%; background:#fff; }
+    table th, table td { border:1px solid #ccc; padding:10px; text-align:center; }
+    button { margin:10px; padding:10px 20px; border:none; border-radius:6px; background:#3d5a1e; color:white; cursor:pointer; font-weight:bold; }
+    button:hover { background:#b8952a; }
+    footer { background:#2b3a1a; color:white; text-align:center; padding:20px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Kéfir artesanal para tu bienestar</h1>
+    <p>Refuerza tu salud intestinal con nuestra bebida probiótica hecha en casa.</p>
+    <p><strong>Forma de pago:</strong> Nequi - 3001234567</p>
+  </header>
+
+  <section id="productos">
+    <h2>Nuestros productos</h2>
+    <div class="producto">
+      <span>Kéfir de leche</span>
+      <input type="text" value="10000" class="precio" disabled> 
+      <input type="number" min="0" value="0" class="cantidad">
+      <input type="file" accept="image/*" disabled>
+    </div>
+    <div class="producto">
+      <span>Kéfir de agua</span>
+      <input type="text" value="8000" class="precio" disabled> 
+      <input type="number" min="0" value="0" class="cantidad">
+      <input type="file" accept="image/*" disabled>
+    </div>
+    <div class="producto">
+      <span>Kombucha</span>
+      <input type="text" value="12000" class="precio" disabled> 
+      <input type="number" min="0" value="0" class="cantidad">
+      <input type="file" accept="image/*" disabled>
+    </div>
+    <div class="producto">
+      <span>Postre Mielmesabe</span>
+      <input type="text" value="6000" class="precio" disabled> 
+      <input type="number" min="0" value="0" class="cantidad">
+      <input type="file" accept="image/*" disabled>
+    </div>
+    <div id="total">Total: $0</div>
+    <button onclick="mostrarResumen()">Ver resumen</button>
+    <button onclick="enviarPedido()">Enviar pedido por WhatsApp</button>
+    <button onclick="toggleAdmin()">Admin</button>
+    <button onclick="backup()">Backup</button>
+    <button onclick="exportarExcel()">Exportar a Excel</button>
+  </section>
+
+  <section id="resumen">
+    <h2>Resumen del pedido</h2>
+    <table id="tablaResumen">
+      <thead>
+        <tr><th>Producto</th><th>Precio</th><th>Cantidad</th><th>Subtotal</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <footer>
+    <p>© 2026 Recuerdos de mi Abuela</p>
+    <p>Contacto: +57 300 123 4567 | Instagram: @recuerdosabuela | TikTok: @recuerdosabuela</p>
+  </footer>
+
+  <script>
+    let adminMode = false;
+
+    function toggleAdmin() {
+      adminMode = !adminMode;
+      document.querySelectorAll('.precio, input[type="file"]').forEach(el => {
+        el.disabled = !adminMode;
+      });
+      alert(adminMode ? "Modo administrador activado" : "Modo administrador desactivado");
+    }
+
+    function calcularTotal() {
+      let total = 0;
+      document.querySelectorAll('.producto').forEach(prod => {
+        let precio = parseInt(prod.querySelector('.precio').value);
+        let cantidad = parseInt(prod.querySelector('.cantidad').value);
+        total += precio * cantidad;
+      });
+      document.getElementById('total').textContent = "Total: $" + total.toLocaleString();
+    }
+    document.querySelectorAll('.precio, .cantidad').forEach(el => {
+      el.addEventListener('input', calcularTotal);
+    });
+
+    function generarToken() {
+      const fecha = new Date();
+      return "PED-" + fecha.getFullYear() + (fecha.getMonth()+1) + fecha.getDate() + "-" + Math.floor(Math.random()*1000);
+    }
+
+    function mostrarResumen() {
+      let tbody = document.querySelector("#tablaResumen tbody");
+      tbody.innerHTML = "";
+      document.querySelectorAll('.producto').forEach(prod => {
+        let precio = parseInt(prod.querySelector('.precio').value);
+        let cantidad = parseInt(prod.querySelector('.cantidad').value);
+        let subtotal = precio * cantidad;
+        if(cantidad > 0){
+          let fila = "<tr><td>"+prod.querySelector('span').textContent+"</td><td>$"+precio+"</td><td>"+cantidad+"</td><td>$"+subtotal+"</td></tr>";
+          tbody.innerHTML += fila;
+        }
+      });
+    }
+
+    function enviarPedido() {
+      let mensaje = "Pedido Recuerdos de mi Abuela:\n";
+      let total = 0;
+      document.querySelectorAll('.producto').forEach(prod => {
+        let nombre = prod.querySelector('span').textContent;
+        let precio = parseInt(prod.querySelector('.precio').value);
+        let cantidad = parseInt(prod.querySelector('.cantidad').value);
+        if(cantidad > 0){
+          let subtotal = precio * cantidad;
+          total += subtotal;
+          mensaje += nombre + " x" + cantidad + " = $" + subtotal + "\n";
+        }
+      });
+      let token = generarToken();
+      mensaje += "Total: $" + total + "\nToken: " + token;
+
+      let url = "https://wa.me/573117700431?text=" + encodeURIComponent(mensaje);
+      window.open(url, "_blank");
+    }
+
+    function backup() {
+      let datos = [];
+      document.querySelectorAll('.producto').forEach(prod => {
+        datos.push({
+          nombre: prod.querySelector('span').textContent,
+          precio: prod.querySelector('.precio').value,
+          cantidad: prod.querySelector('.cantidad').value
+        });
+      });
+      let blob = new Blob([JSON.stringify(datos, null, 2)], {type:"application/json"});
+      let a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "backup.json";
+      a.click();
+    }
+
+    function exportarExcel() {
+      let csv = "Producto,Precio,Cantidad,Subtotal\n";
+      document.querySelectorAll('.producto').forEach(prod => {
+        let precio = parseInt(prod.querySelector('.precio').value);
+        let cantidad = parseInt(prod.querySelector('.cantidad').value);
+        let subtotal = precio * cantidad;
+        csv += prod.querySelector('span').textContent + "," + precio + "," + cantidad + "," + subtotal + "\n";
+      });
+      let blob = new Blob([csv], {type:"text/csv"});
+      let a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "pedido.csv";
+      a.click();
+    }
+  </script>
+</body>
+</html>
